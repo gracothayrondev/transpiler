@@ -360,16 +360,4 @@
 		<name>JSweet</name>
 		<url>http://www.jsweet.org</url>
 	</organization>
-	<distributionManagement>
-		<repository>
-			<id>jsweet-release</id>
-			<name>libs-release</name>
-			<url>https://repository.jsweet.org/artifactory/libs-release-local</url>
-		</repository>
-		<snapshotRepository>
-			<id>jsweet-snapshots</id>
-			<name>libs-snapshot</name>
-			<url>https://repository.jsweet.org/artifactory/libs-snapshot-local</url>
-		</snapshotRepository>
-	</distributionManagement>
 </project>
