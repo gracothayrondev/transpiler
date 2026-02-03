@@ -241,9 +241,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.jsweet.ext</groupId>
+			<groupId>com.github.gracothayrondev</groupId>
 			<artifactId>typescript.java-ts.core</artifactId>
-			<version>2.0.4</version>
+			<version>v2.0.4-java21</version>
 		</dependency>
 
 		<dependency>
