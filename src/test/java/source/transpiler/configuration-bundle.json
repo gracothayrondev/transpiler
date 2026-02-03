@@ -1,9 +1,0 @@
-{
-    "options": {
-        "header": "src/test/java/source/transpiler/header.txt",
-        "bundle": true
-    },
-    "@Erased": {
-        "include": "*.main(..)"
-    }
-}
