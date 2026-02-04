@@ -133,6 +133,8 @@ public class JSweetTranspiler implements JSweetOptions, AutoCloseable {
      * may lead to performance issues - could be fixed if necessary).
      */
     public static final String TSC_VERSION = "5.2";
+    
+    public static final String TMP_WORKING_DIR_NAME = ".jsweet";
 
     static {
         if (!SystemUtils.isJavaVersionAtLeast(JavaVersion.JAVA_1_8)) {
@@ -215,6 +217,7 @@ public class JSweetTranspiler implements JSweetOptions, AutoCloseable {
     private boolean ignoreTypeScriptErrors = false;
     private boolean ignoreJavaErrors = false;
     private boolean forceJavaRuntime = false;
+    private boolean isUsingJavaRuntime = false;
     private File javaRuntimeJ4TsJs = null;
     private File headerFile = null;
     private boolean debugMode = false;
@@ -232,7 +235,7 @@ public class JSweetTranspiler implements JSweetOptions, AutoCloseable {
 
     private ArrayList<String> adapters = new ArrayList<>();
     private File configurationFile;
-
+    
     private TypeScript2JavaScriptTranspiler ts2jsTranspiler = new TypeScript2JavaScriptWithTscTranspiler();
 
     /**
@@ -246,6 +249,11 @@ public class JSweetTranspiler implements JSweetOptions, AutoCloseable {
         forceJavaRuntime = true;
         javaRuntimeJ4TsJs = pathToJ4TsJs;
     }
+    
+    public void setUsingJavaRuntime(boolean usingJavaRuntime) {
+		forceJavaRuntime = true;
+		isUsingJavaRuntime = usingJavaRuntime;
+	}
 
     @Override
     public String toString() {
