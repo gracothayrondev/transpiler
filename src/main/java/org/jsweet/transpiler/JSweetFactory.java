@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jsweet.transpiler.JavaCompilationComponents.JavaCompilerOptions;
+import org.jsweet.transpiler.extension.CustomBigDecimalAdapter;
 import org.jsweet.transpiler.extension.Java2TypeScriptAdapter;
 import org.jsweet.transpiler.extension.PrinterAdapter;
 import org.jsweet.transpiler.extension.RemoveJavaDependenciesAdapter;
@@ -59,67 +60,95 @@ public class JSweetFactory {
 	 * </pre>
 	 */
 	public PrinterAdapter createAdapter(JSweetContext context) {
-		if (context.options.getConfiguration() != null && context.options.getConfiguration().containsKey("adapters")) {
-			// generically creates the adapter chain from the "adapters"
-			// configuration entry
-			logger.info("constructing adapters: " + context.options.getConfiguration().get("adapters"));
-			try {
-				Class<?> adapterClass;
-				PrinterAdapter adapter = null;
-				List<?> adapters = (List<?>) context.options.getConfiguration().get("adapters");
-				for (int i = adapters.size() - 1; i >= 0; i--) {
-					if (adapters.get(i) instanceof String) {
-						adapterClass = PrinterAdapter.class.getClassLoader().loadClass((String) adapters.get(i));
-						if (i == adapters.size() - 1) {
-							Constructor<?> constructor = null;
-							try {
-								constructor = adapterClass.getConstructor(JSweetContext.class);
-							} catch (Exception e) {
-								// swallow
-							}
-							if (constructor == null) {
-								logger.debug("constructing default adapter");
-								adapter = context.getUsingJavaRuntime() != null ? new Java2TypeScriptAdapter(context)
-										: new RemoveJavaDependenciesAdapter(context);
-								try {
-									constructor = adapterClass.getConstructor(PrinterAdapter.class);
-								} catch (Exception e) {
-									// swallow
-								}
-								if (constructor != null) {
-									adapter = (PrinterAdapter) constructor.newInstance(adapter);
-								} else {
-									throw new RuntimeException("wrong adapter class " + adapterClass.getName()
-											+ ": the last adapter must be chainable or be the root adapter (see the PrinterAdapter API)");
-								}
+		
+		PrinterAdapter adapter;
 
-							} else {
-								adapter = (PrinterAdapter) constructor.newInstance(context);
-							}
-						} else {
-							Constructor<?> constructor = adapterClass.getConstructor(PrinterAdapter.class);
-							if (constructor == null) {
-								throw new RuntimeException("wrong adapter class " + adapterClass.getName()
-										+ ": a chainable adapter must define a constructor accepting a parent adapter");
-							} else {
-								adapter = (PrinterAdapter) constructor.newInstance(adapter);
-							}
-						}
-					}
-				}
-				return adapter;
-			} catch (RuntimeException e) {
-				throw e;
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			if (context.getUsingJavaRuntime() != null) {
-				return new Java2TypeScriptAdapter(context);
-			} else {
-				return new RemoveJavaDependenciesAdapter(context);
-			}
-		}
+	    if (context.options.getConfiguration() != null
+	            && context.options.getConfiguration().containsKey("adapters")) {
+
+	        logger.info("constructing adapters: "
+	                + context.options.getConfiguration().get("adapters"));
+
+	        try {
+
+	            Class<?> adapterClass;
+	            adapter = null;
+
+	            List<?> adapters = (List<?>) context.options
+	                    .getConfiguration()
+	                    .get("adapters");
+
+	            for (int i = adapters.size() - 1; i >= 0; i--) {
+
+	                if (adapters.get(i) instanceof String) {
+
+	                    adapterClass = PrinterAdapter.class
+	                            .getClassLoader()
+	                            .loadClass((String) adapters.get(i));
+
+	                    if (i == adapters.size() - 1) {
+
+	                        Constructor<?> constructor = null;
+
+	                        try {
+	                            constructor = adapterClass
+	                                    .getConstructor(JSweetContext.class);
+	                        } catch (Exception e) {
+	                        }
+
+	                        if (constructor == null) {
+
+	                            logger.debug("constructing default adapter");
+
+	                            adapter = context.getUsingJavaRuntime() != null
+	                                    ? new Java2TypeScriptAdapter(context)
+	                                    : new RemoveJavaDependenciesAdapter(context);
+
+	                            try {
+	                                constructor = adapterClass
+	                                        .getConstructor(PrinterAdapter.class);
+	                            } catch (Exception e) {
+	                            }
+
+	                            if (constructor != null) {
+	                                adapter = (PrinterAdapter) constructor
+	                                        .newInstance(adapter);
+	                            } else {
+	                                throw new RuntimeException(
+	                                        "wrong adapter class "
+	                                                + adapterClass.getName());
+	                            }
+
+	                        } else {
+
+	                            adapter = (PrinterAdapter) constructor
+	                                    .newInstance(context);
+	                        }
+
+	                    } else {
+
+	                        Constructor<?> constructor =
+	                                adapterClass.getConstructor(PrinterAdapter.class);
+
+	                        adapter = (PrinterAdapter) constructor
+	                                .newInstance(adapter);
+	                    }
+	                }
+	            }
+
+	        } catch (Exception e) {
+	            throw new RuntimeException(e);
+	        }
+
+	    } else {
+
+	        adapter = context.getUsingJavaRuntime() != null
+	                ? new Java2TypeScriptAdapter(context)
+	                : new RemoveJavaDependenciesAdapter(context);
+	    }
+
+	    return new CustomBigDecimalAdapter(adapter);
+		
 	}
 
 	/**
